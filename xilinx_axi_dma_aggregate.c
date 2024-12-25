@@ -2863,7 +2863,12 @@ static int xilinx_dma_chan_probe(struct xilinx_dma_device *xdev,
 	}
 
 	/* Request the interrupt */
-	chan->irq = irq_of_parse_and_map(node, 0);
+	if (of_property_read_u32(node, "ict,device-id", &device_id)) {
+		chan->irq = irq_of_parse_and_map(node, 0);
+	} else {
+		chan->irq = irq_of_parse_and_map(node, chan->tdest);
+	}
+
 
 	err = request_irq(chan->irq, xdev->dma_config->irq_handler,
 			  IRQF_SHARED, "xilinx-dma-controller", chan);
